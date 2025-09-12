@@ -1,6 +1,6 @@
 [package]
 name = "rinex2bin"
-version = "0.1.0"
+version = "0.2.0"
 license = "MPL-2.0"
 authors = ["Guillaume W. Bres <guillaume.bressaix@gmail.com>"]
 description = "RINEX to binary streamer"
@@ -12,6 +12,9 @@ edition = "2021"
 readme = "README.md"
 
 [features]
+# RTCM + BINEX by default
+default = ["binex", "rtcm"]
+
 # RINEX to BINEX format
 binex = ["rinex/binex"]
 

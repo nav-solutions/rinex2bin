@@ -2,6 +2,19 @@ use binex::prelude::Meta;
 use clap::{Arg, ArgAction, ArgMatches, ColorChoice, Command};
 use std::path::{Path, PathBuf};
 
+pub enum Proto {
+    #[cfg(feature = "gps")]
+    GPS,
+    #[cfg(feature = "qzss")]
+    QZSS,
+    #[cfg(feature = "rtcm")]
+    RTCM,
+    #[cfg(feature = "ubx")]
+    UBX,
+    #[cfg(feature = "binex")]
+    BINEX,
+}
+
 pub struct Cli {
     /// arguments passed by user
     pub matches: ArgMatches,
@@ -34,7 +47,8 @@ Use as many times as needed.")
                         Arg::new("skip-header")
                             .long("skip-header")
                             .action(ArgAction::SetTrue)
-                            .help("Do not serialize the RINEX Header, jump to data serie.")
+                            .help("Do not serialize the RINEX Header, jump to data serie.
+This has no effect to raw protocols like GPS, QZSS..")
                     )
                     .arg(
                         Arg::new("gzip")
@@ -154,7 +168,7 @@ BINEX is the ''Binary'' equivalent to the RINEX format and is fully open-source.
     }
 
     pub fn skip_header(&self) -> bool {
-        self.matches.get_flag("skip")
+        self.matches.get_flag("skip-header")
     }
 
     pub fn gzip(&self) -> bool {
@@ -167,5 +181,54 @@ BINEX is the ''Binary'' equivalent to the RINEX format and is fully open-source.
             enhanced_crc: self.matches.get_flag("crc"),
             big_endian: !self.matches.get_flag("little"),
         }
+    }
+
+    pub fn proto(&self) -> Proto {
+        #[cfg(not(feature = "gps"))]
+        if self.matches.get_flag("gps") {
+            panic!("--gps required GPS compilation option");
+        }
+        #[cfg(feature = "gps")]
+        if self.matches.get_flag("gps") {
+            return Proto::GPS;
+        }
+
+        #[cfg(not(feature = "qzss"))]
+        if self.matches.get_flag("qzss") {
+            panic!("--qzss required QZSS compilation option");
+        }
+        #[cfg(feature = "qzss")]
+        if self.matches.get_flag("qzss") {
+            return Proto::QZSS;
+        }
+
+        #[cfg(not(feature = "binex"))]
+        if self.matches.get_flag("binex") {
+            panic!("--binex required BINEX compilation option");
+        }
+        #[cfg(feature = "binex")]
+        if self.matches.get_flag("binex") {
+            return Proto::BINEX;
+        }
+
+        #[cfg(not(feature = "rtcm"))]
+        if self.matches.get_flag("rtcm") {
+            panic!("--rtcm required RTCM compilation option");
+        }
+        #[cfg(feature = "rtcm")]
+        if self.matches.get_flag("rtcm") {
+            return Proto::RTCM;
+        }
+
+        #[cfg(not(feature = "ubx"))]
+        if self.matches.get_flag("ubx") {
+            panic!("--ubx required UBX compilation option");
+        }
+        #[cfg(feature = "ubx")]
+        if self.matches.get_flag("ubx") {
+            return Proto::UBX;
+        }
+
+        panic!("must select at least one protocol!");
     }
 }

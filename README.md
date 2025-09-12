@@ -56,6 +56,66 @@ Build the tool limited to GPS protocol (example):
 cargo build --no-default-features --features gps
 ```
 
+Deployment
+==========
+
++ You need at least one input file (RINEX file, supported formats: Meteo, Navigation, Clock, Observations, CRINEX).
++ And you need to select a protocol
+
+Example (1): NAV V3 to RTCM file. 
+
+```bash
+rinex2bin -f data/NAV/V3/NYA100NOR_S_20241240000_01D_CN.rnx.gz --rtcm
+```
+
+Example (2): NAV V3 gzip compressed to RTCM file:
+
+```bash
+rinex2bin -f data/NAV/V3/NYA100NOR_S_20241240000_01D_CN.rnx.gz --rtcm
+```
+
+Example (3): PPP context to BINEX file:
+
+```bash
+rinex2bin \
+    -f data/NAV/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
+    -f data/CRNX/V3/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz \
+    --binex
+```
+
+Example (4): PPP to NTRIP server (RTK compatible)
+
+```bash
+rinex2bin \
+    -f data/NAV/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
+    -f data/CRNX/V3/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz \
+    --binex \
+    --tcp 127.0.0.1 \
+    --port 1234
+```
+
+Read more on this on the TCP port chapter.
+
+Example (5): RINEX to raw GPS frames.
+In this case, we will stream navigation messages only, scoped to GPS satellites only.
+
+```bash
+rinex2bin \
+    -f data/NAV/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
+    --gps
+```
+
+
+Example (6): RINEX to raw GPS frames over TCP:
+
+```bash
+rinex2bin \
+    -f data/NAV/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
+    --gps \
+    --tcp 127.0.0.1 \
+    --port 1234
+```
+
 Logs
 ====
 
