@@ -14,18 +14,74 @@ impl Cli {
                 Command::new("rinex2bin")
                     .author("Guillaume W. Bres <guillaume.bressaix@gmail.com>")
                     .version(env!("CARGO_PKG_VERSION"))
-                    .about("RINEX to BINEX")
+                    .about("RINEX to Binary streamer")
                     .arg_required_else_help(true)
                     .color(ColorChoice::Always)
-                    .next_help_heading("Input")
+                    .next_help_heading("RINEX (Input)")
                     .arg(
                         Arg::new("filepath")
-                            .help("Input RINEX file")
-                            .long_help("Input RINEX file. All supported formats may apply, that includes CRINEX.")
-                            .value_name("filepath")
+                            .short('f')
+                            .long("file")
+                            .help("Input RINEX file (supports: Clock, Meteo, Navigation, Observations, CRINEX).
+Accepts gzip compressed file, as long as they are terminated with '.gz'.
+Use as many times as needed.")
+                            .value_name("FILE")
+                            .action(ArgAction::Append)
                             .required(true),
                     )
-                    .next_help_heading("BINEX (forging)")
+                    .next_help_heading("Serialization: applies to any proto")
+                    .arg(
+                        Arg::new("skip-header")
+                            .long("skip-header")
+                            .action(ArgAction::SetTrue)
+                            .help("Do not serialize the RINEX Header, jump to data serie.")
+                    )
+                    .arg(
+                        Arg::new("gzip")
+                            .long("gzip")
+                            .action(ArgAction::SetTrue)
+                            .help("Gzip compress the output stream (whatever its proto).")
+                    )
+                    .next_help_heading("RTCM (protocol)")
+                    .arg(
+                        Arg::new("rtcm")
+                            .long("rtcm")
+                            .action(ArgAction::SetTrue)
+                            .required_unless_present_any(&["ubx", "binex", "gps", "qzss"])
+                            .help("Select RTCM protocol forging.
+You may forge RTCM to binary file, or serve it over --udp/--tcp, which gives a so called ntrip server."))
+                    .next_help_heading("UBX (protocol)")
+                    .arg(
+                        Arg::new("ubx")
+                            .long("ubx")
+                            .action(ArgAction::SetTrue)
+                            .required_unless_present_any(&["rtcm", "binex", "gps", "qzss"])
+                            .help("Select UBX protocol forging.
+You may forge UBX to binary file, or serve it over --udp/--tcp."))
+                    .next_help_heading("GPS (protocol)")
+                    .arg(
+                        Arg::new("gps")
+                            .long("gps")
+                            .action(ArgAction::SetTrue)
+                            .required_unless_present_any(&["rtcm", "binex", "ubx", "qzss"])
+                            .help("Select GPS protocol forging.
+You may forge GPS to binary file, or serve it over --udp/--tcp."))
+                    .arg(
+                        Arg::new("qzss")
+                            .long("qzss")
+                            .action(ArgAction::SetTrue)
+                            .required_unless_present_any(&["rtcm", "binex", "ubx", "gps"])
+                            .help("Select QZSS protocol forging.
+You may forge QZSS to binary file, or serve it over --udp/--tcp."))
+                    .next_help_heading("BINEX (protocol)")
+                    .arg(
+                        Arg::new("binex")
+                            .long("binex")
+                            .action(ArgAction::SetTrue)
+                            .required_unless_present_any(&["ubx", "rtcm", "gps", "qzss"])
+                            .help("Select BINEX protocol forging.
+BINEX is the ''Binary'' equivalent to the RINEX format and is fully open-source.")
+                    )
                     .arg(
                         Arg::new("little")
                             .short('l')
@@ -38,7 +94,7 @@ impl Cli {
                             .short('c')
                             .long("crc")
                             .action(ArgAction::SetTrue)
-                            .help("Encode stream uses enhanced CRC technique (for very robust messaging).")
+                            .help("Encoded stream uses enhanced CRC technique (for very robust messaging).")
                         )
                     .arg(
                         Arg::new("reversed")
@@ -47,21 +103,12 @@ impl Cli {
                             .action(ArgAction::SetTrue)
                             .help("Forge a Reversed BINEX Stream.")
                     )
-                    .arg(
-                        Arg::new("skip")
-                            .long("skip")
-                            .action(ArgAction::SetTrue)
-                            .help("Skip RINEX Header section serialization.")
-                            .long_help("Skip RINEX Header section serialization.
-By default, the RINEX header is serialized after the announce message.
-Using this option, you can directly jump to the RINEX file content after the announce message.")
-                    )
-                    .next_help_heading("Output File")
+                    .next_help_heading("Output Interface")
                     .arg(
                         Arg::new("output")
                             .short('o')
                             .long("output")
-                            .value_name("filepath")
+                            .value_name("FILE")
                             .action(ArgAction::Set)
                             .conflicts_with("stream")
                             .required(false)
@@ -83,12 +130,6 @@ Using this option, you can directly jump to the RINEX file content after the ann
                             .value_name("writable interface")
                             .required(false)
                             .help("Stream on custom I/O interface, instead of forging a BIN file.")
-                    )
-                    .arg(
-                        Arg::new("gzip")
-                            .long("gzip")
-                            .action(ArgAction::SetTrue)
-                            .help("Gzip compress the BINEX stream.")
                     )
                     .get_matches()
             },

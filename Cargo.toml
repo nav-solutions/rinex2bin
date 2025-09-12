@@ -3,19 +3,36 @@ name = "rinex2bin"
 version = "0.1.0"
 license = "MPL-2.0"
 authors = ["Guillaume W. Bres <guillaume.bressaix@gmail.com>"]
-description = "RINEX to BINEX serialization"
-homepage = "https://github.com/rtk-rs"
-repository = "https://github.com/rtk-rs/rinex2bin"
+description = "RINEX to binary streamer"
+homepage = "https://github.com/nav-solutions"
+repository = "https://github.com/nav-solutions/rinex2bin"
 keywords = ["rinex", "geo"] 
 categories = ["science", "science::geo", "command-line-interface", "command-line-utilities"]
 edition = "2021"
 readme = "README.md"
 
+[features]
+# RINEX to BINEX format
+binex = ["rinex/binex"]
+
+# RINEX to UBX format
+ubx = ["rinex/ublox"]
+
+# RINEX to RTCM format
+rtcm = ["rinex/rtcm"]
+
+# RINEX to GPS protocol
+# gps  = ["rinex/protos"]
+
+# RINEX to QZSS protocol
+# qzss = ["rinex/protos"]
+
 [dependencies]
 log = "0.4"
 flate2 = "1"
 thiserror = "2"
-binex = "0.4.2"
+binex = "0.5"
 env_logger = "0.11"
 clap = { version = "4.5", features = ["derive", "color"] }
-rinex = { version = "0.17.0", features = ["flate2", "binex"] }
+# rinex = { version = "0.22.0", features = ["flate2", "binex"] }
+rinex = { git = "https://github.com/nav-solutions/rinex", branch = "ublox", features = ["flate2"] }

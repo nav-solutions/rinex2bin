@@ -1,28 +1,28 @@
 RINEX2BIN
 =========
 
-[![Rust](https://github.com/rtk-rs/rinex2bin/actions/workflows/rust.yml/badge.svg)](https://github.com/rtk-rs/rinex2bin/actions/workflows/rust.yml)
-[![Rust](https://github.com/rtk-rs/rinex2bin/actions/workflows/daily.yml/badge.svg)](https://github.com/rtk-rs/rinex2bin/actions/workflows/daily.yml)
+[![Rust](https://github.com/nav-solutions/rinex2bin/actions/workflows/rust.yml/badge.svg)](https://github.com/nav-solutions/rinex2bin/actions/workflows/rust.yml)
+[![Rust](https://github.com/nav-solutions/rinex2bin/actions/workflows/daily.yml/badge.svg)](https://github.com/nav-solutions/rinex2bin/actions/workflows/daily.yml)
 [![crates.io](https://img.shields.io/crates/v/rinex2bin.svg)](https://crates.io/crates/rinex2bin)
 
-[![License](https://img.shields.io/badge/license-MPL_2.0-orange?style=for-the-badge&logo=mozilla)](https://github.com/rtk-rs/rinex2bin/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-MPL_2.0-orange?style=for-the-badge&logo=mozilla)](https://github.com/nav-solutions/rinex2bin/blob/main/LICENSE)
 
-`rinex2bin` is a small command line utility to serialize your RINEX (Receiver Indepent EXchange) files
-into BINEX (Binary EXchange). The tool can either
+`rinex2bin` is a command line utility to serialize your RINEX (Receiver Indepent EXchange) files
+into binary formats. We cover many protosol
 
-- serialize into a BINEX (so called "bin") file,
-which may serve as a very compact option to distribute your GNSS/Geo data
+- BINEX: the RINEX ''binary'' equivalent (open source)
+- GPS: the GPS (US) broadcast protocol
+- QZSS: the QZSS (Japan) broadcast protocol
+- RTCM: ntrip server and RTK protocol
+- UBX: U-Blox receivers protocols
 
-- stream directly to a writable I/O interface. Allowing to broadcast your GNSS/Geo data
-in real-time.
-
-This tool is based on the [GeoRust/RINEX parser](https://github.com/georust/rinex).
-
-:warning: Currenly, `rinex2bin` works well with Navigation RINEX. Observation RINEX is work in progress.
+The application can serialize into a binary file (for example a UBX file, or GPS binary file),
+or deploy as a TCP/UDP server. When streaming to RTCM protocol and deploying as TCP server,
+this application is identical to a so called NTRIP server.
 
 ## Download the tool
 
-You can download the latest version from [the release portal](https://github.com/rtk-rs/rinex2bin/releases)
+You can download the latest version from [the release portal](https://github.com/nav-solutions/rinex2bin/releases)
 
 ## Install from Cargo
 
@@ -37,7 +37,7 @@ cargo install rinex2bin
 Download the version you are interested in:
 
 ```bash
-git clone https://github.com/rtk-rs/rinex2bin
+git clone https://github.com/nav-solutions/rinex2bin
 ```
 
 And build it using cargo:
@@ -89,7 +89,7 @@ announcing the start of the file body
 RUST_LOG rinex2bin amel0010.21g
 
 [2025-02-22T13:21:01Z DEBUG rinex2bin] Streaming started!
-[2025-02-22T13:44:53Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2020-12-31T23:45:00 UTC, meta: RNX2BIN, comments: ["rtk-rs/rinex2bin v0.0.1 from V2 Glonass NAVIGATION DATA", "Stream starting!"], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }] }) }
+[2025-02-22T13:44:53Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2020-12-31T23:45:00 UTC, meta: RNX2BIN, comments: ["nav-solutions/rinex2bin v0.0.1 from V2 Glonass NAVIGATION DATA", "Stream starting!"], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }] }) }
 [2025-02-22T13:21:01Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2020-12-31T23:45:00 UTC, meta: RNX2BIN, comments: [], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }] }) }
 [2025-02-22T13:21:01Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2020-12-31T23:45:00 UTC, meta: RNX2BIN, comments: ["RINEX Header comments following!"], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }] }) }
 [2025-02-22T13:21:01Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2020-12-31T23:45:00 UTC, meta: RNX2BIN, comments: ["Linux 2.4.21-27.ELsmp|Opteron|gcc|Linux 64|=+", "GN-RINEX 1.3        Geo++ GmbH          31-DEC-20 23:59", "gfzrnx-1.13-7761    FILE MERGE          20210101 010301 UTC"], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }] }) }
@@ -106,7 +106,7 @@ The input RINEX can be Gzip compressed, but its name needs to be terminated by `
 RUST_LOG=trace rinex2bin GEOP092I.24o.gz
 
 [2025-02-22T13:54:02Z DEBUG rinex2bin] Streaming started!
-[2025-02-22T13:54:02Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2024-04-01T08:30:58.442760200 UTC, meta: RNX2BIN, comments: ["rtk-rs/rinex2bin v0.0.1 from V3 MIXED OBS DATA", "Stream starting!"], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }] }) }
+[2025-02-22T13:54:02Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2024-04-01T08:30:58.442760200 UTC, meta: RNX2BIN, comments: ["nav-solutions/rinex2bin v0.0.1 from V3 MIXED OBS DATA", "Stream starting!"], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }] }) }
 [2025-02-22T13:54:02Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2024-04-01T08:30:58.442760200 UTC, meta: RNX2BIN, comments: [], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }, GeoStringFrame { fid: AgencyName, string: "Geo++" }, GeoStringFrame { fid: ObserverName, string: "Geo++" }, GeoStringFrame { fid: ReceiverType, string: "Xiaomi" }, GeoStringFrame { fid: ReceiverNumber, string: "unknown" }, GeoStringFrame { fid: ReceiverFirmwareVersion, string: "M2007J17G" }] }) }
 [2025-02-22T13:54:02Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2024-04-01T08:30:58.442760200 UTC, meta: RNX2BIN, comments: ["RINEX Header comments following!"], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }] }) }
 [2025-02-22T13:54:02Z DEBUG rinex2bin] Streaming: Message { meta: Meta { reversed: false, enhanced_crc: false, big_endian: true }, record: MonumentGeo(MonumentGeoRecord { epoch: 2024-04-01T08:30:58.442760200 UTC, meta: RNX2BIN, comments: ["************************************************************", "This file was generated by the Geo++ RINEX Logger App", "for Android devices (Version 2.1.6). If you encounter", "any issues, please send an email to android@geopp.de", "Filtering Mode: BEST", "************************************************************"], frames: [GeoStringFrame { fid: SoftwareName, string: "geo-rust v0.17.0-beta" }] }) }
@@ -186,5 +186,5 @@ RUST_LOG=trace rinex2bin GEOP092I.24o.gz -s /dev/ttyUSB0 --gzip
 
 ## Licensing
 
-This application is part of the [RTK-rs framework](https://github.com/rtk-rs) which
-is delivered under the [Mozilla V2 Public](https://www.mozilla.org/en-US/MPL/2.0) license.
+This application is part of the [Nav-solutions framework](https://github.com/nav-solutions) which
+is licensed under [Mozilla V2 Public](https://www.mozilla.org/en-US/MPL/2.0) license.
