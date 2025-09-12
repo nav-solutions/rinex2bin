@@ -10,15 +10,17 @@ RINEX2BIN
 `rinex2bin` is a command line utility to serialize your RINEX (Receiver Indepent EXchange) files
 into binary formats. We cover many protosol
 
-- BINEX: the RINEX ''binary'' equivalent (open source)
-- GPS: the GPS (US) broadcast protocol
-- QZSS: the QZSS (Japan) broadcast protocol
-- RTCM: ntrip server and RTK protocol
-- UBX: U-Blox receivers protocols
+- BINEX: the RINEX ''binary'' equivalent (open source), on `binex` tool feature.
+- GPS: the GPS (US) broadcast protocol, on `gps` tool feature.
+- QZSS: the QZSS (Japan) broadcast protocol, on `qzss` tool feature.
+- RTCM: ntrip server and RTK protocol, on `rtcm` tool feature.
+- UBX: U-Blox receivers protocols, on `ubx` tool feature.
 
 The application can serialize into a binary file (for example a UBX file, or GPS binary file),
 or deploy as a TCP/UDP server. When streaming to RTCM protocol and deploying as TCP server,
 this application is identical to a so called NTRIP server.
+
+All protocols are feature dependent. By default this application only comes with BINEX and RTCM protocols.
 
 ## Download the tool
 
@@ -26,7 +28,8 @@ You can download the latest version from [the release portal](https://github.com
 
 ## Install from Cargo
 
-You can directly install the tool from Cargo with internet access:
+You can directly install the tool from Cargo with internet access,
+which supports all protocols:
 
 ```bash
 cargo install rinex2bin
@@ -44,6 +47,13 @@ And build it using cargo:
 
 ```bash
 cargo build --all-features -r
+```
+
+
+Build the tool limited to GPS protocol (example):
+
+```bash
+cargo build --no-default-features --features gps
 ```
 
 Logs
