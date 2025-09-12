@@ -13,26 +13,42 @@ jobs:
   build:
     name: Build 
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - name: Default build
-            opts: -r
-          - name: All Features
-            opts: --all-features
-
     steps:
     - uses: actions/checkout@v3
+
+    - name: Linter
+      run: cargo fmt --all -- --check
+
     - uses: actions-rs/toolchain@v1
       name: Install Rust
       with:
         toolchain: stable
         override: true
-    - name: Install Dependencies
+
+    - name: Build (Default)
       run: |
-        sudo apt-get update
+        cargo build
     
-    - name: ${{ matrix.name }} 
+    - name: Build (All features)
       run: |
-        cargo clean && cargo update && cargo build ${{ matrix.opts }}
+        cargo build --all-features
+    
+    - name: Build (BINEX)
+      run: |
+        cargo build --no-default-features --features binex
+    
+    - name: Build (GPS)
+      run: |
+        cargo build --no-default-features --features gps
+    
+    - name: Build (QZSS)
+      run: |
+        cargo build --no-default-features --features qzss
+    
+    - name: Build (RTCM)
+      run: |
+        cargo build --no-default-features --features rtcm
+    
+    - name: Build (UBX)
+      run: |
+        cargo build --no-default-features --features ubx

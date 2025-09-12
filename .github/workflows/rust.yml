@@ -16,18 +16,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build
-    - name: Build (all features)
-      run: cargo build --all-features
-    - name: Coding style
+
+    - name: Linter
       run: cargo fmt --all -- --check
   
+    - name: Build (Default)
+      run: cargo build
+
+    - name: Build (All features)
+      run: cargo build --all-features
+
+    - name: Build (BINEX)
+      run: |
+        cargo build --no-default-features --features binex
+    
+    - name: Build (GPS)
+      run: |
+        cargo build --no-default-features --features gps
+    
+    - name: Build (QZSS)
+      run: |
+        cargo build --no-default-features --features qzss
+    
+    - name: Build (RTCM)
+      run: |
+        cargo build --no-default-features --features rtcm
+    
+    - name: Build (UBX)
+      run: |
+        cargo build --no-default-features --features ubx
+
   windows-build:
     name: Windows
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
+
     - uses: actions-rs/toolchain@v1
       name: Install Rust
       with:
